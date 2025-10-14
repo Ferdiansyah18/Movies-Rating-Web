@@ -1,0 +1,67 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+
+#mainNavbar {
+    transition:color 0.3s ease,  background-color 0.3s ease;
+}
+
+.navbar .nav-link,
+.navbar .navbar-brand {
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+#mainNavbar nav.navbar {
+  background-color: transparent; /* default */
+}
+
+#mainNavbar .navbar-nav .nav-link,
+#mainNavbar .navbar-brand,
+#mainNavbar .navbar-user .nav-link {
+    transition: color 0.3s ease;
+}
+
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  display: none;
+}
+
+#searchResults {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: #fff;
+    border-radius: .5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    z-index: 2000;
+}
+#searchResults a.list-group-item {
+    cursor: pointer;
+}
+#searchResults a.list-group-item:hover {
+    background-color: #f1f1f1;
+}
+
+
+
+@media (max-width: 991px) {
+  #mainNavbar nav.navbar {
+    background-color: rgba(33, 37, 41, 0.5); /* bg-dark dengan 50% opacity */
+    backdrop-filter: blur(6px); /* opsional */
+  }
+
+#mainNavbar.scrolled .nav-link,
+#mainNavbar.scrolled .navbar-brand,
+#mainNavbar.scrolled .navbar-user span {
+    color: #fff !important; /* Semua link navbar jadi putih */
+    transition: color 0.3s ease;
+}
+
+    /* Ubah ikon hamburger jadi putih */
+  #mainNavbar .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255,255,255,1%29' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+  }
+}
