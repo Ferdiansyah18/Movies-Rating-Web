@@ -1,11 +1,13 @@
 @vite(['resources/css/app.css', 'resources/js/app.js'])
-@props(['textColor' => 'text-light']) {{-- default text-light --}}
+@props(['textColor' => 'text-light'])
+@props(['position' => 'position-fixed'])
 
-<div class="z-3 position-fixed w-100 top-0" id="mainNavbar">
+
+<div class="z-3 {{ $position }} w-100 top-0" id="mainNavbar">
     <nav class="navbar navbar-expand-lg navbar-dark px-md-5">
         <div class="container-fluid">
             {{-- Brand --}}
-            <a class="navbar-brand {{ $textColor }}" href="{{ url('/') }}">LuminaFlick</a>
+            <a class="navbar-brand {{ $textColor }}" href="{{ url('/') }}">CinePals</a>
 
             {{-- Toggler --}}
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
@@ -18,8 +20,8 @@
             <div class="collapse navbar-collapse d-lg-flex justify-content-between" id="navbarNavAltMarkup">
                 {{-- Links --}}
                 <div class="navbar-nav">
-                    <a class="nav-link {{ $textColor }}" href="#">Movies</a>
-                    <a class="nav-link {{ $textColor }}" href="#">TV Shows</a>
+                    <a class="nav-link {{ $textColor }}" href="{{ route('movies.discover') }}">Movies</a>
+                    <a class="nav-link {{ $textColor }}" href="{{ route('tv.discover') }}">TV Shows</a>
                 </div>
 
                 {{-- User Section --}}

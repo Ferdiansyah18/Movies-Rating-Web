@@ -15,10 +15,7 @@ class HomeController extends Controller
 
     public function index() // gabungan upcoming + popular
     {
-        $upcomingMovies = $this->tmdb->getUpcomingMovies();
-
-        // kirim keduanya ke view
-        return view('home', compact('upcomingMovies'));
+        return view('home');
     }
 
 }

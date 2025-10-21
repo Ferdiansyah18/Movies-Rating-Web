@@ -8,9 +8,14 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
+use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 Route::get('/', [HomeController::class, 'index']);
+
+Route::get('/discover/movies', [MovieController::class, 'index'])->name('movies.discover');
+
+Route::get('/discover/tv', [TvController::class, 'index'])->name('tv.discover');
 
 Route::get('/movie/{id}', [MovieController::class, 'show'])->name('movies.detail');
 
@@ -30,8 +35,9 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [ProfileController::class, 'index'])->name('dashboard');
-    Route::post('/dashboard/update', [ProfileController::class, 'update'])->name('dashboard.update');
-    Route::post('/dashboard/password', [ProfileController::class, 'updatePassword'])->name('dashboard.password');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/settings', [DashboardController::class, 'settings'])->name('profile.settings');
+    Route::post('/settings/update', [DashboardController::class, 'updateProfile'])->name('dashboard.update');
+    Route::post('/settings/password', [DashboardController::class, 'updatePassword'])->name('dashboard.password');
 });

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $movie['title'] }} | LuminaFlick</title>
+    <title>{{ $movie['title'] }} | CinePals</title>
+    <link rel="shortcut icon" href="{{ asset('image/favicon_io/android-chrome-512x512.png') }}" type="image/x-icon">
 </head>
 <body style="overflow-x: hidden;">
 
@@ -34,10 +35,37 @@
         <div class="row flex-column flex-md-row g-5">
 
             {{-- Poster --}}
-            <div class="container col-5 col-md-3 col-xl-2 text-center">
-                <div class="card">
-                    <img src="https://image.tmdb.org/t/p/original{{ $movie['poster_path'] }}" 
-                         alt="{{ $movie['title'] }}" class="card-img-top">
+            <div class="container col-5 col-md-3 col-xl-2">
+                <div class="card position-sticky border-0" style="top: 80px;">
+                    <img src="https://image.tmdb.org/t/p/w500{{ $movie['poster_path'] }}" 
+                         alt="{{ $movie['title'] }}" class="card-img-top mb-3">
+                    <div>
+                        <ul class="list-inline d-none d-md-flex flex-column gap-3">
+                            @if($movie['original_language'] !== 'en')
+                                <li class="list-inline-item">
+                                    <h6>Original Name:</h6> {{ $movie['original_title'] }}
+                                </li>
+                            @endif
+                            <li>
+                                <h6>Duration:</h6>
+                                <span>{{ $movie['runtime'] }} Min</span>
+                            </li>
+                            <li>
+                                <h6>Genres:</h6>
+                                @foreach($movie['genres'] as $genre)
+                                    <span class="badge bg-secondary">{{ $genre['name'] }}</span>
+                                @endforeach
+                            </li>
+                            <li>
+                                <h6>Release Date:</h6>
+                                <span>{{ $movie['release_date'] }}</span>
+                            </li>
+                            <li>
+                                <h6>Status:</h6>
+                                <span>{{ $movie['status'] }}</span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
@@ -50,19 +78,40 @@
                 <p class="mt-3">{{ $movie['overview'] }}</p>
 
                 {{-- Metadata --}}
-                <ul class="list-inline mt-3">
+                <ul class="list-inline d-flex d-md-none gap-3 mt-3">
+
+                    @if($movie['original_language'] !== 'en')
+                        <li class="list-inline-item">
+                            <h6>Original Name:</h6> {{ $movie['original_title'] }}
+                        </li>
+                    @endif
+
+                    @if(!empty($movie['runtime']))
+                        <li>
+                            <h6>Duration:</h6>
+                            <span>{{ $movie['runtime'] }} Min</span>
+                        </li>
+                    @endif
+
                     @if(!empty($movie['genres']))
-                        <li class="list-inline-item"><h6>Genres:</h6>
+                        <li class="list-inline-item">
+                            <h6>Genres:</h6>
                             @foreach($movie['genres'] as $genre)
                                 <span class="badge bg-secondary">{{ $genre['name'] }}</span>
                             @endforeach
                         </li>
                     @endif
-                    @if(!empty($movie['runtime']))
-                        <li class="list-inline-item"><h6>Duration:</h6> {{ $movie['runtime'] }} min</li>
+
+                    @if(!empty($movie['first_air_date']))
+                        <li class="list-inline-item">
+                            <h6>Release Date:</h6> {{ $movie['first_air_date'] }}
+                        </li>
                     @endif
+
                     @if(!empty($movie['status']))
-                        <li class="list-inline-item"><h6>Status:</h6> {{ $movie['status'] }}</li>
+                        <li class="list-inline-item">
+                            <h6>Status:</h6> {{ $movie['status'] }}
+                        </li>
                     @endif
                 </ul>
 
@@ -72,7 +121,7 @@
                     <div class="d-flex flex-wrap mt-3 gap-4">
                         @foreach ($movieProviders['results']['ID']['flatrate'] as $provider)
                             <div class="text-center d-flex flex-column align-items-center gap-2">
-                                <img src="https://image.tmdb.org/t/p/original{{ $provider['logo_path'] }}" 
+                                <img src="https://image.tmdb.org/t/p/w500{{ $provider['logo_path'] }}" 
                                      alt="{{ $provider['provider_name'] }}" class="rounded" 
                                      style="height: 40px; width: 40px;">
                                 <p class="mb-0 small">{{ $provider['provider_name'] }}</p>
@@ -91,7 +140,7 @@
                             @foreach($credits['cast'] as $cast)
                                 <div class="card border-0" style="width: 120px; flex: 0 0 auto;">
                                     @if ($cast['profile_path'])
-                                        <img src="https://image.tmdb.org/t/p/original{{ $cast['profile_path'] }}" 
+                                        <img src="https://image.tmdb.org/t/p/h632{{ $cast['profile_path'] }}" 
                                              class="card-img-top rounded" 
                                              alt="{{ $cast['name'] ?? $cast['original_name'] }}">
                                     @else
@@ -108,7 +157,7 @@
                             @endforeach
                         </div>
                     @else
-                        <p class="text-muted">No Cast Available</p>
+                        <p class="text-muted text-center">No Cast Available</p>
                     @endif
                 </div>
 
@@ -173,7 +222,7 @@
                                     <a href="{{ route('movies.detail', $recommendation['id']) }}" class="text-decoration-none">
                                         <div class="card">
                                             @if(!empty($recommendation['poster_path']))
-                                                <img src="https://image.tmdb.org/t/p/original/{{ $recommendation['poster_path'] }}"
+                                                <img src="https://image.tmdb.org/t/p/w500/{{ $recommendation['poster_path'] }}"
                                                      alt="{{ $recommendation['title'] }}"
                                                      class="img-fluid rounded"
                                                      style="max-width: 175px; max-height:255px;">

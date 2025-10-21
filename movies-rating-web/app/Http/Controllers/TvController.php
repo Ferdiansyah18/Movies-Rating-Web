@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\TmdbService;
 use App\Models\Review;
+use Illuminate\Http\Request;
 
 class TvController extends Controller
 {
@@ -12,6 +13,16 @@ class TvController extends Controller
     public function __construct(TmdbService $tmdb)
     {
         $this->tmdb = $tmdb;
+    }
+
+    public function index(Request $request) {
+        $genreId = $request->query('genre');
+        $page = $request->query('page', 1);
+
+        $discoverTv = $this->tmdb->getDiscoverTv($genreId, $page);
+        $genres = $this->tmdb->getGenresTv();
+
+        return view('tv.discover', compact('discoverTv', 'genres', 'genreId'));
     }
 
     public function show($id) {

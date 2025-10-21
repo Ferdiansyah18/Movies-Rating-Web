@@ -56,6 +56,25 @@ class TmdbService {
         return $response->json()['results'] ?? [];
     }
 
+    public function getDiscoverMovies($genreId = null, $page = 1) {
+        $response = Http::withToken($this->apiKey)
+            ->get("{$this->baseUrl}/discover/movie", [
+                'language' => 'en-US',
+                'sort_by' => 'popularity.desc',
+                'with_genres' => $genreId,
+                'page' => $page
+            ]);
+        return $response->json();
+    }
+
+    public function getGenresMovies() {
+        $response = Http::withToken($this->apiKey)
+            ->get("{$this->baseUrl}/genre/movie/list", [
+                'language' => 'en-US',
+            ]);
+        return $response->json()['genres'] ?? [];
+    }
+
     public function randomBackdrop() {
 
         $response = Http::withToken($this->apiKey)
@@ -103,5 +122,24 @@ class TmdbService {
         $response = Http::withToken($this->apiKey)
             ->get("{$this->baseUrl}/tv/top_rated");
         return $response->json()['results'] ?? [];
+    }
+
+    public function getDiscoverTv($genreId = null, $page = 1) {
+        $response = Http::withToken($this->apiKey)
+            ->get("{$this->baseUrl}/discover/tv", [
+                'language' => 'en-US',
+                'sort_by' => 'popularity.desc',
+                'with_genres' => $genreId,
+                'page' => $page
+            ]);
+        return $response->json();
+    }
+
+    public function getGenresTv() {
+        $response = Http::withToken($this->apiKey)
+            ->get("{$this->baseUrl}/genre/tv/list", [
+                'language' => 'en-US',
+            ]);
+        return $response->json()['genres'] ?? [];
     }
 }
