@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $movie['title'] }} | CinePals</title>
     <link rel="shortcut icon" href="{{ asset('image/favicon_io/android-chrome-512x512.png') }}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
 <body style="overflow-x: hidden;">
 
@@ -12,9 +13,9 @@
 
     {{-- Background Gradient Overlay --}}
     <div class="container position-absolute top-0 start-50 translate-middle-x w-100 h-100"
-        style="max-height: 57vh; pointer-events: none;
-        background: linear-gradient(to right, white 0%, transparent 10%, transparent 70%, white 100%), 
-                    linear-gradient(to left, white 0%, transparent 10%, transparent 70%, white 100%);">
+         style="max-height: 57vh; pointer-events: none;
+                background: linear-gradient(to right, white 0%, transparent 10%, transparent 70%, white 100%), 
+                            linear-gradient(to left, white 0%, transparent 10%, transparent 70%, white 100%);">
     </div>
 
     {{-- Backdrop Section --}}
@@ -71,15 +72,39 @@
 
             {{-- Movie Details --}}
             <div class="container col-10 col-md-9 mt-md-5 pt-3 ps-md-5 ps-xl-0">
-                <h1 class="fw-bold">{{ $movie['title'] }}</h1>
+                <div class="row align-items-center">
+                    <h1 class="fw-bold col-9">{{ $movie['title'] }}</h1>
+                    <div class="col-3 d-flex justify-content-center gap-2">
+                        <!-- Favourites -->
+                        <button id="favouriteBtn" 
+                                class="btn d-flex align-items-center gap-2 {{ $favourite ? 'btn-danger' : 'btn-outline-danger' }}"
+                                data-id="{{ $movie['id'] }}"
+                                data-title="{{ $movie['title'] }}"
+                                data-poster="{{ $movie['poster_path'] }}"
+                                data-type="movie">
+                            <i class="bi {{ $favourite ? 'bi-heart-fill' : 'bi-heart' }}"></i>
+                        </button>
+
+                        <!-- Watchlist -->
+                        <button id="watchlistBtn" 
+                                class="btn d-flex align-items-center gap-2 {{ $watchlist ? 'btn-warning' : 'btn-outline-warning' }}"
+                                data-id="{{ $movie['id'] }}"
+                                data-title="{{ $movie['title'] }}"
+                                data-poster="{{ $movie['poster_path'] }}"
+                                data-type="movie">
+                            <i class="bi {{ $watchlist ? 'bi-bookmark-fill' : 'bi-bookmark' }}"></i>
+                        </button>
+                    </div>
+                </div>
+
                 @if (!empty($movie['tagline']))
                     <h5 class="text-muted fst-italic">{{ $movie['tagline'] }}</h5>
                 @endif
+
                 <p class="mt-3">{{ $movie['overview'] }}</p>
 
                 {{-- Metadata --}}
                 <ul class="list-inline d-flex d-md-none gap-3 mt-3">
-
                     @if($movie['original_language'] !== 'en')
                         <li class="list-inline-item">
                             <h6>Original Name:</h6> {{ $movie['original_title'] }}
@@ -175,38 +200,40 @@
                     @endphp
 
                     {{-- Display Existing Reviews --}}
-                    <div class="mb-4 mt-2">
-                        @foreach ($reviews as $review)
-                            <div class="d-flex align-items-start mb-3">
-                                <img 
-                                    src="{{ $review->user && $review->user->profile_picture
-                                                ? asset('storage/' . $review->user->profile_picture)
-                                                : asset('images/default-avatar.png') }}" 
-                                    class="rounded-circle object-fit-cover me-3" width="50" height="50" alt="User profile">
-                                <div>
-                                    <strong>{{ $review->user->name ?? 'User tidak ditemukan' }}</strong>
-                                    <p class="mb-1 text-muted" style="font-size: 0.9rem;">
-                                        {{ $review->created_at->diffForHumans() }}
-                                    </p>
-                                    <div class="bg-light p-3 rounded shadow-sm">
-                                        <p class="mb-0">{{ $review->comment }}</p>
-                                    </div>
+                <div class="mb-4 mt-2">
+                    @forelse($reviews as $review)
+                        <div class="d-flex align-items-start mb-3">
+                            <img 
+                                src="{{ $review->user && $review->user->profile_picture
+                                            ? asset('storage/' . $review->user->profile_picture)
+                                            : asset('images/default-avatar.png') }}" 
+                                class="rounded-circle object-fit-cover me-3" width="50" height="50" alt="User profile">
+                            <div>
+                                <strong>{{ $review->user->name ?? 'Anonymous' }}</strong>
+                                <p class="mb-1 text-muted" style="font-size: 0.9rem;">
+                                    {{ $review->created_at->diffForHumans() }}
+                                </p>
+                                <div class="bg-light p-3 rounded shadow-sm">
+                                    <p class="mb-0">{{ $review->comment }}</p>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
+                        </div>
+                    @empty
+                        <p class="text-muted text-center">No reviews yet. Be the first to write one!</p>
+                    @endforelse
+                </div>
 
                     {{-- Submit Review Form --}}
                     @auth
-                    <form action="{{ route('reviews.store') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="item_id" value="{{ $movie['id'] }}">
-                        <input type="hidden" name="item_type" value="movie">
-                        <textarea name="comment" class="form-control" rows="3" placeholder="Write your review..."></textarea>
-                        <button type="submit" class="btn btn-primary mt-2">Submit Review</button>
-                    </form>
+                        <form action="{{ route('reviews.store') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="item_id" value="{{ $movie['id'] }}">
+                            <input type="hidden" name="item_type" value="movie">
+                            <textarea name="comment" class="form-control" rows="3" placeholder="Write your review..."></textarea>
+                            <button type="submit" class="btn btn-primary mt-2">Submit Review</button>
+                        </form>
                     @else
-                        <p class="text-muted mt-3">
+                        <p class="text-muted text-center mt-3">
                             <a href="{{ route('login') }}">Login</a> untuk menulis review.
                         </p>
                     @endauth
@@ -247,6 +274,102 @@
     </div>
 
     <x-footer/>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const showToast = (message, icon = 'success') => {
+        Swal.fire({
+            toast: true,
+            position: 'top',
+            icon: icon,
+            title: message,
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+        });
+    };
+
+    // === Favourite Button ===
+    const favBtn = document.getElementById('favouriteBtn');
+    favBtn.addEventListener('click', function() {
+        const btn = this;
+
+        fetch('/favourites/toggle', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tmdb_id: btn.dataset.id,
+                title: btn.dataset.title,
+                poster_path: btn.dataset.poster,
+                type: btn.dataset.type,
+            }),
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                const isAdded = res.action === 'added';
+
+                // Ubah tampilan tombol
+                if (isAdded) {
+                    btn.classList.remove('btn-outline-danger');
+                    btn.classList.add('btn-danger');
+                    btn.querySelector('i').classList.replace('bi-heart', 'bi-heart-fill');
+                    showToast('Added to favourites ❤️');
+                } else {
+                    btn.classList.remove('btn-danger');
+                    btn.classList.add('btn-outline-danger');
+                    btn.querySelector('i').classList.replace('bi-heart-fill', 'bi-heart');
+                    showToast('Removed from favourites 💔', 'error');
+                }
+            }
+        });
+    });
+
+    // === Watchlist Button ===
+    const watchBtn = document.getElementById('watchlistBtn');
+    watchBtn.addEventListener('click', function() {
+        const btn = this;
+
+        fetch('/watchlists/toggle', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tmdb_id: btn.dataset.id,
+                title: btn.dataset.title,
+                poster_path: btn.dataset.poster,
+                type: btn.dataset.type,
+            }),
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                const isAdded = res.action === 'added';
+
+                if (isAdded) {
+                    btn.classList.remove('btn-outline-warning');
+                    btn.classList.add('btn-warning');
+                    btn.querySelector('i').classList.replace('bi-bookmark', 'bi-bookmark-fill');
+                    showToast('Added to watchlist 📚');
+                } else {
+                    btn.classList.remove('btn-warning');
+                    btn.classList.add('btn-outline-warning');
+                    btn.querySelector('i').classList.replace('bi-bookmark-fill', 'bi-bookmark');
+                    showToast('Removed from watchlist 🗑️', 'error');
+                }
+            }
+        });
+    });
+});
+</script>
+
 
 </body>
 </html>

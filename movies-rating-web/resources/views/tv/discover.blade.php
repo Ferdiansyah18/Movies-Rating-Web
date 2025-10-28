@@ -81,7 +81,7 @@
 
                 {{-- Pagination --}}
                 @if(isset($discoverTv['page']))
-                    <div class="d-flex justify-content-center mt-4">
+                    <div class="d-flex justify-content-center my-4">
                         @php
                             $currentGenres = request()->query('genre');
                         @endphp

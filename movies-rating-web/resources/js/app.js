@@ -98,3 +98,25 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+// Favourite and Watchlist Button
+    document.addEventListener('DOMContentLoaded', function() {
+        const favBtn = document.getElementById('favouriteBtn');
+        const watchBtn = document.getElementById('watchlistBtn');
+
+        favBtn.addEventListener('click', () => {
+            favBtn.classList.toggle('btn-danger');
+            favBtn.classList.toggle('btn-outline-danger');
+            const icon = favBtn.querySelector('i');
+            icon.classList.toggle('bi-heart');
+            icon.classList.toggle('bi-heart-fill');
+        });
+
+        watchBtn.addEventListener('click', () => {
+            watchBtn.classList.toggle('btn-warning');
+            watchBtn.classList.toggle('btn-outline-warning');
+            const icon = watchBtn.querySelector('i');
+            icon.classList.toggle('bi-bookmark');
+            icon.classList.toggle('bi-bookmark-fill');
+        });
+    });

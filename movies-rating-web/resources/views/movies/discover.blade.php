@@ -81,7 +81,7 @@
 
                 {{-- Pagination --}}
                 @if(isset($discoverMovies['page']))
-                    <div class="d-flex justify-content-center mt-4">
+                    <div class="d-flex justify-content-center my-4">
                         @php
                             $currentGenres = request()->query('genre');
                         @endphp

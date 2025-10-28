@@ -9,6 +9,8 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FavouriteController;
+use App\Http\Controllers\WatchlistController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 Route::get('/', [HomeController::class, 'index']);
@@ -22,6 +24,12 @@ Route::get('/movie/{id}', [MovieController::class, 'show'])->name('movies.detail
 Route::get('/tv/{id}', [TvController::class, 'show'])->name('tv.detail');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+Route::get('/favourites', [FavouriteController::class, 'index'])->name('favourites.index');
+Route::get('/watchlists', [WatchlistController::class, 'index'])->name('watchlists.index');
+
+Route::post('/favourites/toggle', [FavouriteController::class, 'toggle'])->middleware('auth');
+Route::post('/watchlists/toggle', [WatchlistController::class, 'toggle'])->middleware('auth');
 
 Route::get('/api', [ApiController::class, 'fetchMovies']);
 

@@ -34,14 +34,14 @@
         <div class="card-body p-0">
           <ul class="list-group list-group-flush">
             <li class="list-group-item p-0">
-              <button class="btn btn-light w-100 text-start py-3 px-4 d-flex align-items-center">
-                <i class="bi bi-heart-fill me-2 text-danger"></i> Favourite
-              </button>
+              <a href="{{ route('favourites.index') }}" class="btn btn-light w-100 text-start py-3 px-4 d-flex align-items-center">
+                <i class="bi bi-heart-fill me-2 text-danger"></i> Favourites
+              </a>
             </li>
             <li class="list-group-item p-0">
-              <button class="btn btn-light w-100 text-start py-3 px-4 d-flex align-items-center">
+              <a href="{{ route('watchlists.index') }}" class="btn btn-light w-100 text-start py-3 px-4 d-flex align-items-center">
                 <i class="bi bi-bookmark-fill me-2 text-warning"></i> Watchlist
-              </button>
+              </a>
             </li>
             <li class="list-group-item p-0">
               <a href="{{ route('profile.settings') }}" class="btn btn-light w-100 text-start py-3 px-4 d-flex align-items-center">

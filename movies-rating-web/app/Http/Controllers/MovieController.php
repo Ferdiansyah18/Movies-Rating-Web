@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Services\TmdbService;
 use Illuminate\Http\Request;
 use App\Models\Review;
+use App\Models\Favourite;
+use App\Models\Watchlist;
 
 class MovieController extends Controller
 {
@@ -39,10 +41,23 @@ class MovieController extends Controller
             ->latest()
             ->get();
 
+    $userId = auth()->id();
+
+    // Cek apakah sudah favourite / watchlist
+    $favourite = Favourite::where('user_id', $userId)
+                          ->where('tmdb_id', $id)
+                          ->where('type', 'movie')
+                          ->exists();
+
+    $watchlist = Watchlist::where('user_id', $userId)
+                          ->where('tmdb_id', $id)
+                          ->where('type', 'movie')
+                          ->exists();
+
         if (!$movie) {
             abort(404, 'Movie Not Found!');
         }
 
-        return view('movies.detail', compact('movie', 'movieProviders', 'credits', 'recommendations', 'reviews'));
+        return view('movies.detail', compact('movie', 'movieProviders', 'credits', 'recommendations', 'reviews', 'favourite', 'watchlist'));
     }
 }

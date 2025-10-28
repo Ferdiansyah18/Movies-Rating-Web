@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Services\TmdbService;
 use App\Models\Review;
 use Illuminate\Http\Request;
+use App\Models\Favourite;
+use App\Models\Watchlist;
 
 class TvController extends Controller
 {
@@ -40,10 +42,24 @@ class TvController extends Controller
             ->latest()
             ->get();
 
+        
+    $userId = auth()->id();
+
+    // Cek apakah sudah favourite / watchlist
+    $favourite = Favourite::where('user_id', $userId)
+                          ->where('tmdb_id', $id)
+                          ->where('type', 'tv')
+                          ->exists();
+
+    $watchlist = Watchlist::where('user_id', $userId)
+                          ->where('tmdb_id', $id)
+                          ->where('type', 'tv')
+                          ->exists();
+
         if (!$tv) {
             abort(404, 'Tv Series Not Found!');
         }
 
-        return view('tv.detail', compact('tv', 'tvProviders', 'credits', 'recommendations'));
+        return view('tv.detail', compact('tv', 'tvProviders', 'credits', 'recommendations', 'favourite', 'watchlist'));
     }
 }
