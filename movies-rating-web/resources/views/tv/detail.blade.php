@@ -80,6 +80,8 @@
                             data-id="{{ $tv['id'] }}"
                             data-title="{{ $tv['name'] }}"
                             data-poster="{{ $tv['poster_path'] }}"
+                            data-overview="{{ $tv['overview'] }}"
+                            data-tagline="{{ $tv['tagline'] }}"
                             data-type="tv">
                         <i class="bi {{ $favourite ? 'bi-heart-fill' : 'bi-heart' }}"></i>
                     </button>
@@ -90,6 +92,8 @@
                             data-id="{{ $tv['id'] }}"
                             data-title="{{ $tv['name'] }}"
                             data-poster="{{ $tv['poster_path'] }}"
+                            data-overview="{{ $tv['overview'] }}"
+                            data-tagline="{{ $tv['tagline'] }}"
                             data-type="tv">
                         <i class="bi {{ $watchlist ? 'bi-bookmark-fill' : 'bi-bookmark' }}"></i>
                     </button>
@@ -307,6 +311,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 tmdb_id: btn.dataset.id,
                 title: btn.dataset.title,
                 poster_path: btn.dataset.poster,
+                overview:btn.dataset.overview,
+                tagline:btn.dataset.tagline,
                 type: btn.dataset.type,
             }),
         })
@@ -346,6 +352,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 tmdb_id: btn.dataset.id,
                 title: btn.dataset.title,
                 poster_path: btn.dataset.poster,
+                overview:btn.dataset.overview,
+                tagline:btn.dataset.tagline,
                 type: btn.dataset.type,
             }),
         })

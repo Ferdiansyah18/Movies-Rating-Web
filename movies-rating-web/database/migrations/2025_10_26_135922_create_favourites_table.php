@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('tmdb_id');
             $table->string('title');
             $table->string('poster_path')->nullable();
+            $table->string('overview');
+            $table->string('tagline')->nullable();
             $table->string('type'); // movie or tv
             $table->timestamps();
         });

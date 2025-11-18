@@ -14,6 +14,8 @@ class Watchlist extends Model
         'tmdb_id',
         'title',
         'poster_path',
+        'overview',
+        'tagline',
         'type',
     ];
 

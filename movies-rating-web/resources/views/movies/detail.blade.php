@@ -81,6 +81,8 @@
                                 data-id="{{ $movie['id'] }}"
                                 data-title="{{ $movie['title'] }}"
                                 data-poster="{{ $movie['poster_path'] }}"
+                                data-overview="{{ $movie['overview'] }}"
+                                data-tagline="{{ $movie['tagline'] }}"
                                 data-type="movie">
                             <i class="bi {{ $favourite ? 'bi-heart-fill' : 'bi-heart' }}"></i>
                         </button>
@@ -91,6 +93,8 @@
                                 data-id="{{ $movie['id'] }}"
                                 data-title="{{ $movie['title'] }}"
                                 data-poster="{{ $movie['poster_path'] }}"
+                                data-overview="{{ $movie['overview'] }}"
+                                data-tagline="{{ $movie['tagline'] }}"
                                 data-type="movie">
                             <i class="bi {{ $watchlist ? 'bi-bookmark-fill' : 'bi-bookmark' }}"></i>
                         </button>
@@ -306,6 +310,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 tmdb_id: btn.dataset.id,
                 title: btn.dataset.title,
                 poster_path: btn.dataset.poster,
+                overview:btn.dataset.overview,
+                tagline:btn.dataset.tagline,
                 type: btn.dataset.type,
             }),
         })
@@ -345,6 +351,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 tmdb_id: btn.dataset.id,
                 title: btn.dataset.title,
                 poster_path: btn.dataset.poster,
+                overview:btn.dataset.overview,
+                tagline:btn.dataset.tagline,
                 type: btn.dataset.type,
             }),
         })

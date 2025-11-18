@@ -16,35 +16,25 @@ $watchlists = Watchlist::where('user_id', auth()->id())->get();
 <x-navbar textColor="text-dark"/>
 
 <div class="container py-5">
-    <h1 class="mb-4">My Watchlist</h1>
+    <h2 class="my-4">My Watchlist</h1>
 
     @if($watchlists->isEmpty())
         <p>You don't have any movies or series in your watchlist yet.</p>
     @else
-        <div class="row">
-            @foreach($watchlists as $item)
-                <div class="col-md-3 mb-4">
-                    <div class="card h-100">
-                        {{-- Poster --}}
-                        <img src="{{ $item->poster_path ? 'https://image.tmdb.org/t/p/w500'.$item->poster_path : asset('images/default-poster.png') }}" 
-                             class="card-img-top" 
-                             alt="{{ $item->title }}">
-
-                        <div class="card-body d-flex flex-column">
-                            {{-- Title --}}
-                            <h5 class="card-title">{{ $item->title }}</h5>
-
-                            {{-- Type --}}
-                            <p class="card-text">
-                                {{ $item->type === 'movie' ? 'Movie' : 'Series' }}
-                            </p>
-
-                            {{-- View Details --}}
-                            <a href="{{ $item->type === 'movie' ? url('/movie/'.$item->tmdb_id) : url('/tv/'.$item->tmdb_id) }}" 
-                               class="btn btn-primary btn-sm mb-2">View Details</a>
+        <div class="d-flex flex-column gap-3">
+            @foreach ($watchlists as $item)
+                <a href="{{ $item->type === 'movie' ? url('/movie/'.$item->tmdb_id) : url('/tv/'.$item->tmdb_id) }}" class="row border-bottom pb-3 text-decoration-none text-dark">
+                    <div class="col-2">
+                        <img class="col-10 rounded object-fit" src="{{ 'https://image.tmdb.org/t/p/w500'.$item->poster_path }}"" alt="$item->title">
+                    </div>
+                    <div class="col-10">
+                        <div class="d-flex justify-content-start flex-column">
+                            <h3>{{ $item->title }}</h5>
+                            <h5 class="text-muted fst-italic">{{ $item->tagline }}</h5>
+                            <p>{{ $item->overview ?? 'no overview available' }}</p>
                         </div>
                     </div>
-                </div>
+                </a>
             @endforeach
         </div>
     @endif

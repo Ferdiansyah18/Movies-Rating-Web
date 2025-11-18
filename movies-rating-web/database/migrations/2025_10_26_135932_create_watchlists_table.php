@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('watchlist', function (Blueprint $table) {
+        Schema::create('watchlists', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('tmdb_id');
             $table->string('title');
             $table->string('poster_path')->nullable();
+            $table->string('overview');
+            $table->string('tagline')->nullable();
             $table->string('type'); // movie or tv
             $table->timestamps();
         });

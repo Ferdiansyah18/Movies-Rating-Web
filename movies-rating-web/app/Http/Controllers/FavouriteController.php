@@ -35,6 +35,8 @@ class FavouriteController extends Controller
                 'tmdb_id' => $request->tmdb_id,
                 'title' => $request->title,
                 'poster_path' => $request->poster_path,
+                'overview' => $request->overview,
+                'tagline' => $request->tagline,
                 'type' => $request->type,
             ]);
 
