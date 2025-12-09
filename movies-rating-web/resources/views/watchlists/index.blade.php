@@ -38,6 +38,7 @@ $watchlists = Watchlist::where('user_id', auth()->id())->get();
             @endforeach
         </div>
     @endif
+    
 </div>
 
 </body>

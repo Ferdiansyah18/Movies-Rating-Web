@@ -2,8 +2,7 @@
 @props(['textColor' => 'text-light'])
 @props(['position' => 'position-fixed'])
 
-
-<div class="z-3 {{ $position }} w-100 top-0" id="mainNavbar">
+<div class="{{ $position }} w-100 top-0" id="mainNavbar" style="z-index: 9999999;">
     <nav class="navbar navbar-expand-lg navbar-dark px-md-5">
         <div class="container-fluid">
             {{-- Brand --}}
@@ -28,13 +27,20 @@
                 <div class="navbar-user d-flex align-items-center gap-2">
                     @auth
                         <a href="{{ route('dashboard') }}" class="d-flex align-items-center text-decoration-none gap-2">
-                            <img 
-                                src="{{ auth()->user()->profile_picture 
-                                      ? asset('storage/' . auth()->user()->profile_picture) 
-                                      : 'https://via.placeholder.com/35' }}" 
-                                alt="Profile" 
-                                class="rounded-circle object-fit-cover" 
-                                width="35" height="35">
+                            
+                            {{-- LOGIKA FOTO PROFIL --}}
+                            @if(auth()->user()->profile_picture)
+                                {{-- Jika user punya foto --}}
+                                <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" 
+                                     alt="Profile" 
+                                     class="rounded-circle object-fit-cover" 
+                                     width="35" height="35">
+                            @else
+                                {{-- Jika user BELUM punya foto (Default Icon) --}}
+                                {{-- fs-3 membuat ukurannya mirip dengan width 35px --}}
+                                <i class="bi bi-person-circle {{ $textColor }} fs-3"></i>
+                            @endif
+
                             <span class="{{ $textColor }}">{{ auth()->user()->name }}</span>
                         </a>
                     @else

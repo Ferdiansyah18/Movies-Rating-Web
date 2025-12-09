@@ -9,41 +9,43 @@ class SearchController extends Controller
 {
     public function index(Request $request)
     {
-        $query = $request->get('q');
+        // PERBAIKAN 1: Ganti 'q' menjadi 'query' agar sesuai dengan fetch frontend
+        $query = $request->get('query');
 
         if (!$query) {
             return response()->json([]);
         }
 
-        // Panggil TMDB multi search
-        $response = Http::withToken(env('TMDB_TOKEN'))
-            ->get('https://api.themoviedb.org/3/search/multi', [
-                'query' => $query,
-                // language en-US supaya judulnya tetap original
-                'language' => 'en-US',
-                // include adult false supaya aman
-                'include_adult' => false,
-            ]);
+        try {
+            // Panggil TMDB multi search
+            $response = Http::withToken(env('TMDB_TOKEN'))
+                ->get('https://api.themoviedb.org/3/search/multi', [
+                    'query' => $query,
+                    'language' => 'en-US',
+                    'include_adult' => false,
+                ]);
 
-        // Ambil results
-        $results = collect($response->json('results') ?? [])
-            ->filter(function ($item) {
-                // filter hanya movie & tv
-                return in_array($item['media_type'], ['movie', 'tv']);
-            })
-            ->take(10) // batasi maksimal 10
-            ->map(function ($item) {
-                return [
-                    'id'         => $item['id'],
-                    'title'      => $item['title'] ?? $item['name'], // movie: title, tv: name
-                    'poster'     => $item['poster_path']
-                        ? 'https://image.tmdb.org/t/p/w185'.$item['poster_path'] // lebih ringan
-                        : null,
-                    'media_type' => $item['media_type'],
-                ];
-            })
-            ->values();
+            if ($response->failed()) {
+                return response()->json([], 500); // Return error jika TMDB gagal
+            }
 
-        return response()->json($results);
+            // Ambil results
+            $results = collect($response->json('results') ?? [])
+                ->filter(function ($item) {
+                    // Filter hanya movie & tv, dan pastikan ada poster/backdrop agar tampilan bagus (opsional)
+                    return isset($item['media_type']) && in_array($item['media_type'], ['movie', 'tv']);
+                })
+                ->take(10) // Batasi 10 hasil
+                ->values(); // Reset array keys agar menjadi JSON array yang valid
+
+            // PERBAIKAN 2: Jangan di-map/ubah strukturnya.
+            // Biarkan return data mentah (raw) agar logic JS di frontend (item.poster_path, item.release_date) tetap jalan.
+            
+            return response()->json($results);
+
+        } catch (\Exception $e) {
+            // Log error jika perlu
+            return response()->json(['error' => 'Something went wrong'], 500);
+        }
     }
 }

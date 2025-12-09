@@ -7,6 +7,7 @@
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="shortcut icon" href="{{ asset('image/favicon_io/android-chrome-512x512.png') }}" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
 
 <body class="bg-light">
@@ -30,7 +31,6 @@
           </div>
         @endif
 
-        <!-- ================= PROFILE ================= -->
         <div>
           <h3>Edit Profile</h3>
           <div class="row p-3">
@@ -52,15 +52,25 @@
             </div>
 
             <div class="col-lg-4 col-md-3 col-sm-12 text-center mb-3 order-md-2 order-1 d-flex align-items-center justify-content-center">
-              <img src="{{ $user->profile_picture ? asset('storage/'.$user->profile_picture) : 'https://via.placeholder.com/100' }}"
-                   class="rounded-circle object-fit-cover mb-3"
-                   width="100" height="100"
-                   alt="Profile Picture">
+              
+              {{-- LOGIKA FOTO PROFIL --}}
+              @if($user->profile_picture)
+                  {{-- Jika ada foto --}}
+                  <img src="{{ asset('storage/'.$user->profile_picture) }}"
+                       class="rounded-circle object-fit-cover mb-3"
+                       width="100" height="100"
+                       alt="Profile Picture">
+              @else
+                  {{-- Jika TIDAK ada foto (Icon Default) --}}
+                  <div class="mb-3">
+                      <i class="bi bi-person-circle text-secondary" style="font-size: 100px; line-height: 1;"></i>
+                  </div>
+              @endif
+
             </div>
           </div>
         </div>
 
-        <!-- ================= PASSWORD ================= -->
         <div class="mt-3 pt-3 border-top">
           <h3>Change Password</h3>
           <div class="row p-3">
@@ -88,7 +98,6 @@
           </div>
         </div>
 
-        <!-- ================= BACK BUTTON ================= -->
         <div class="text-center mt-4">
           <a href="{{ route('dashboard') }}" class="text-decoration-none text-secondary">
             <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
@@ -99,9 +108,6 @@
     </div>
   </div>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-
-  <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>

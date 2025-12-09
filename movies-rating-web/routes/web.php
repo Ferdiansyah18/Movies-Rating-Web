@@ -23,17 +23,31 @@ Route::get('/movie/{id}', [MovieController::class, 'show'])->name('movies.detail
 
 Route::get('/tv/{id}', [TvController::class, 'show'])->name('tv.detail');
 
-Route::get('/search', [SearchController::class, 'index'])->name('search');
+Route::get('/api/search', [SearchController::class, 'index'])->name('search');
 
 Route::get('/favourites', [FavouriteController::class, 'index'])->name('favourites.index');
 Route::get('/watchlists', [WatchlistController::class, 'index'])->name('watchlists.index');
 
-Route::post('/favourites/toggle', [FavouriteController::class, 'toggle'])->middleware('auth');
-Route::post('/watchlists/toggle', [WatchlistController::class, 'toggle'])->middleware('auth');
+Route::middleware('auth')->group(function () {
+    Route::post('/watchlists/toggle', [WatchlistController::class, 'toggle']);
+    Route::post('/favourites/toggle', [FavouriteController::class, 'toggle']);
+});
 
 Route::get('/api', [ApiController::class, 'fetchMovies']);
 
-Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+Route::middleware(['auth'])->group(function () {
+    // Halaman Form Review (Menerima tipe dan ID item)
+    Route::get('/reviews/create/{type}/{id}', [ReviewController::class, 'create'])->name('reviews.create');
+    
+    // Proses Simpan
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+});
+
+// Halaman Detail Review (Bisa diakses publik)
+Route::get('/reviews/{review}', [ReviewController::class, 'show'])->name('reviews.show');
+
+Route::post('/reviews/{review}/like', [App\Http\Controllers\ReviewController::class, 'toggleLike'])
+    ->name('reviews.like')->middleware('auth');
 
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
