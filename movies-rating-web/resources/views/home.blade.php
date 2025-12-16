@@ -309,231 +309,241 @@
   
   <x-footer />
 
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Elements Selection
-      const trendingSection = document.getElementById('trendingSection');
-      const popularSection = document.getElementById('popularSection');
-      const topratedSection = document.getElementById('topratedSection');
-      const reviewsSection = document.getElementById('reviewsSection'); 
-      const backdropSection = document.getElementById('backdropSection');
-      
-      const searchBox = document.getElementById('searchBox');
-      const searchResults = document.getElementById('searchResults');
-
-      // ================= 1. FETCH DATA UTAMA =================
-      try {
-        const response = await fetch('/api'); 
-        const data = await response.json();
-
-        // 1.A Render Backdrop
-        if (data.randomBackdrop) {
-          backdropSection.innerHTML = `
-            <img src="${data.randomBackdrop}" class="w-100 h-100 position-absolute top-0 start-0" style="object-fit: cover; filter: brightness(30%); z-index:1;">
-          `;
-        }
-
-        // 1.B Helper Function Render Card
-        const renderCards = (items) => items.map(item => {
-            const title = item.title ?? item.name;
-            let finalRoute = '/movie/' + item.id;
-            
-            if (item.media_type === 'tv') {
-                finalRoute = '/tv/' + item.id;
-            } else if (!item.media_type) {
-                if (item.first_air_date) finalRoute = '/tv/' + item.id;
-                else finalRoute = '/movie/' + item.id;
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // ================= CONFIGURATION & SELECTORS =================
+        const DOM = {
+            sections: {
+                trending: document.getElementById('trendingSection'),
+                popular: document.getElementById('popularSection'),
+                toprated: document.getElementById('topratedSection'),
+                reviews: document.getElementById('reviewsSection'),
+                backdrop: document.getElementById('backdropSection'),
+            },
+            search: {
+                box: document.getElementById('searchBox'),
+                results: document.getElementById('searchResults'),
             }
+        };
+
+        // ================= 1. HELPER FUNCTIONS =================
+        const getImageUrl = (path, size = 'w500') => 
+            path ? `https://image.tmdb.org/t/p/${size}${path}` : 'https://placehold.co/500x750?text=No+Image';
+
+        const formatDate = (dateString) => {
+            if (!dateString) return '';
+            return new Date(dateString).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        };
+
+        const getYear = (dateString) => dateString ? `(${dateString.substring(0, 4)})` : '';
+
+        // ================= 2. COMPONENT RENDERERS =================
+        
+        // A. Render Movie/TV Card (Potrait)
+        const createMovieCard = (item) => {
+            const title = item.title || item.name;
+            const isTv = item.media_type === 'tv' || (!item.media_type && item.first_air_date);
+            const route = isTv ? `/tv/${item.id}` : `/movie/${item.id}`;
 
             return `
-              <a href="${finalRoute}" class="hover-card flex-shrink-0">
-                <img src="https://image.tmdb.org/t/p/w500${item.poster_path}" class="img-fluid rounded shadow-sm" style="width:170px; height:255px; object-fit:cover;" alt="${title}">
-              </a>
+                <a href="${route}" class="hover-card flex-shrink-0" title="${title}">
+                    <img src="${getImageUrl(item.poster_path)}" 
+                         class="img-fluid rounded shadow-sm" 
+                         style="width:170px; height:255px; object-fit:cover;" 
+                         alt="${title}" loading="lazy">
+                </a>
             `;
-        }).join('');
+        };
 
-        // 1.C Render Section Movies
-        if(trendingSection) trendingSection.innerHTML = renderCards(data.trending);
-        if(popularSection) popularSection.innerHTML = renderCards(data.popularMovies);
-        if(topratedSection) topratedSection.innerHTML = renderCards(data.tvTopRated);
+        // B. Render Review Card (Landscape with Snapshot Data)
+        const createReviewCard = (review) => {
+            // User Info
+            const avatar = review.user && review.user.profile_picture 
+                ? `/storage/${review.user.profile_picture}` 
+                : 'https://ui-avatars.com/api/?background=random&name=' + (review.user ? review.user.name : 'User');
+            const userName = review.user ? review.user.name : 'Anonymous';
+            
+            // Review Info
+            const shortComment = review.comment.length > 80 ? review.comment.substring(0, 80) + '...' : review.comment;
+            
+            // Movie/TV Info (Dari Snapshot Database)
+            const posterUrl = getImageUrl(review.media_poster, 'w154'); // Pakai ukuran kecil w154
+            const mediaTitle = review.media_title || 'Unknown Title';
+            const mediaYear = review.media_year ? `(${review.media_year})` : '';
 
-        // 1.D Render Reviews
-        if (data.latestReviews && data.latestReviews.length > 0) {
-            // Kita render lebih banyak agar scroll berfungsi (misal 15)
-            const reviewsToRender = data.latestReviews.slice(0, 15); 
-
-            if(reviewsSection) {
-                reviewsSection.innerHTML = reviewsToRender.map(review => {
-                    const avatar = review.user && review.user.profile_picture ? `/storage/${review.user.profile_picture}` : '/image/default-avatar.png';
-                    const userName = review.user ? review.user.name : 'Anonymous';
-                    const shortComment = review.comment.length > 80 ? review.comment.substring(0, 80) + '...' : review.comment;
-
-                    return `
-                    <a href="/reviews/${review.id}" class="text-decoration-none text-dark flex-shrink-0">
-                        <div class="card border-0 shadow-sm p-3 hover-card h-100" style="width: 300px; min-height: 180px; background: white; border-radius: 12px;">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                 <div class="d-flex align-items-center">
-                                    <img src="${avatar}" class="rounded-circle object-fit-cover border" width="40" height="40" alt="${userName}">
-                                    <div class="ms-2">
-                                        <h6 class="mb-0 fw-bold" style="font-size: 0.9rem;">${userName}</h6>
-                                        <small class="text-muted" style="font-size: 0.75rem;">${new Date(review.created_at).toLocaleDateString()}</small>
-                                    </div>
-                                 </div>
-                                 <span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> ${review.rating}</span>
+            return `
+            <a href="/reviews/${review.id}" class="text-decoration-none text-dark flex-shrink-0">
+                <div class="card border-0 shadow-sm p-3 hover-card h-100" style="width: 320px; min-height: 220px; background: white; border-radius: 12px;">
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                         <div class="d-flex align-items-center">
+                            <img src="${avatar}" class="rounded-circle border" width="30" height="30" style="object-fit: cover;">
+                            <div class="ms-2 lh-1">
+                                <div class="fw-bold" style="font-size: 0.8rem;">${userName}</div>
+                                <small class="text-muted" style="font-size: 0.65rem;">${formatDate(review.created_at)}</small>
                             </div>
-                            <h6 class="card-title fw-bold text-truncate mb-1">${review.title}</h6>
-                            <p class="card-text text-muted small" style="line-height: 1.4;">"${shortComment}"</p>
-                            <div class="mt-auto d-flex align-items-center gap-1 text-primary small fw-semibold">Read full review <i class="bi bi-arrow-right"></i></div>
+                         </div>
+                         <div class="badge bg-warning text-dark d-flex align-items-center gap-1">
+                            <i class="bi bi-star-fill" style="font-size: 0.7rem;"></i> ${review.rating}
+                         </div>
+                    </div>
+
+                    <div class="d-flex align-items-center bg-light rounded p-2 mb-3 border">
+                        <img src="${posterUrl}" class="rounded flex-shrink-0" width="40" height="60" style="object-fit: cover;">
+                        <div class="ms-2 overflow-hidden">
+                            <small class="text-secondary fw-bold" style="font-size: 0.6rem; letter-spacing: 0.5px;">REVIEWING</small>
+                            <h6 class="mb-0 fw-bold text-truncate" style="font-size: 0.85rem;">${mediaTitle}</h6>
+                            <small class="text-muted" style="font-size: 0.75rem;">${mediaYear}</small>
                         </div>
-                    </a>
+                    </div>
+
+                    <h6 class="card-title fw-bold text-truncate mb-1" style="font-size: 0.95rem;">${review.title}</h6>
+                    <p class="card-text text-muted small" style="line-height: 1.4; font-size: 0.85rem;">"${shortComment}"</p>
+                    
+                    <div class="mt-auto pt-2 border-top d-flex align-items-center gap-1 text-primary small fw-semibold">
+                        Read full review <i class="bi bi-arrow-right"></i>
+                    </div>
+                </div>
+            </a>`;
+        };
+
+        // ================= 3. MAIN LOGIC =================
+        
+        const initHomePage = async () => {
+            try {
+                const response = await fetch('/api');
+                const data = await response.json();
+
+                // 1. Render Backdrop
+                if (data.randomBackdrop && DOM.sections.backdrop) {
+                    DOM.sections.backdrop.innerHTML = `
+                        <img src="${data.randomBackdrop}" class="w-100 h-100 position-absolute top-0 start-0" 
+                             style="object-fit: cover; filter: brightness(30%); z-index:1;">
+                    `;
+                }
+
+                // 2. Render Movie Sections
+                if (DOM.sections.trending) DOM.sections.trending.innerHTML = data.trending.map(createMovieCard).join('');
+                if (DOM.sections.popular) DOM.sections.popular.innerHTML = data.popularMovies.map(createMovieCard).join('');
+                if (DOM.sections.toprated) DOM.sections.toprated.innerHTML = data.tvTopRated.map(createMovieCard).join('');
+
+                // 3. Render Reviews Section
+                if (DOM.sections.reviews) {
+                    if (data.latestReviews && data.latestReviews.length > 0) {
+                        DOM.sections.reviews.innerHTML = data.latestReviews.slice(0, 15).map(createReviewCard).join('');
+                    } else {
+                        DOM.sections.reviews.innerHTML = `<div class="w-100 text-center text-muted py-4">No reviews yet. Be the first!</div>`;
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error loading home data:', error);
+            }
+        };
+
+        // ================= 4. CAROUSEL LOGIC =================
+        const initScrollHandlers = () => {
+            const setupSection = (sectionId, wrapperId, prevId, nextId, cardWidth, gap) => {
+                const section = document.getElementById(sectionId);
+                const wrapper = document.getElementById(wrapperId);
+                const prevBtn = document.getElementById(prevId);
+                const nextBtn = document.getElementById(nextId);
+
+                if (!section || !wrapper || !prevBtn || !nextBtn) return;
+
+                const scrollAmount = (cardWidth + gap) * 2; // Scroll 2 kartu sekaligus
+
+                const handleShadows = () => {
+                    const maxScroll = section.scrollWidth - section.clientWidth - 5;
+                    wrapper.classList.toggle('show-shadow-left', section.scrollLeft > 5);
+                    wrapper.classList.toggle('show-shadow-right', section.scrollLeft < maxScroll);
+                };
+
+                nextBtn.onclick = () => section.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                prevBtn.onclick = () => section.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                
+                section.addEventListener('scroll', handleShadows);
+                window.addEventListener('resize', handleShadows);
+                setTimeout(handleShadows, 500); // Initial check
+            };
+
+            // Setup parameters: ID Section, ID Wrapper, ID Prev, ID Next, Card Width, Gap
+            setupSection('trendingSection', 'trendingWrapper', 'trendingPrevBtn', 'trendingNextBtn', 170, 16);
+            setupSection('popularSection', 'popularWrapper', 'popularPrevBtn', 'popularNextBtn', 170, 16);
+            setupSection('topratedSection', 'topratedWrapper', 'topratedPrevBtn', 'topratedNextBtn', 170, 16);
+            setupSection('reviewsSection', 'reviewsWrapper', 'reviewPrevBtn', 'reviewNextBtn', 320, 24); // Card Review lebih lebar
+        };
+
+        // ================= 5. SEARCH LOGIC =================
+        const initSearch = () => {
+            const { box, results } = DOM.search;
+            if (!box || !results) return;
+
+            let debounce;
+
+            const renderResults = (items) => {
+                if (items.length === 0) {
+                    results.innerHTML = `<div class="p-3 text-center text-muted">No results found.</div>`;
+                    return;
+                }
+                results.innerHTML = items.map(item => {
+                    const title = item.title || item.name;
+                    const type = item.media_type === 'movie' ? 'Movie' : 'TV Show';
+                    const date = item.release_date || item.first_air_date;
+                    const link = item.media_type === 'movie' ? `/movie/${item.id}` : `/tv/${item.id}`;
+                    
+                    return `
+                        <a href="${link}" class="list-group-item list-group-item-action d-flex align-items-center gap-3 p-2 border-0 border-bottom">
+                            <img src="${getImageUrl(item.poster_path, 'w92')}" class="rounded" width="45" height="68" style="object-fit:cover;">
+                            <div>
+                                <h6 class="mb-0 fw-bold text-dark">${title}</h6>
+                                <small class="text-muted">${type} • ${getYear(date)}</small>
+                            </div>
+                        </a>
                     `;
                 }).join('');
-            }
-        } else {
-            if(reviewsSection) reviewsSection.innerHTML = `<p class="text-muted w-100 text-center">No reviews yet. Be the first to write one!</p>`;
-        }
+            };
 
-      } catch (error) {
-        console.error('Error fetching home data:', error);
-      }
+            const doSearch = async (query) => {
+                if (!query) {
+                    results.innerHTML = `<div class="p-3 text-center text-muted">Type to search...</div>`;
+                    return;
+                }
+                
+                results.classList.remove('d-none');
+                results.innerHTML = `<div class="p-4 text-center"><div class="spinner-border text-primary spinner-border-sm"></div></div>`;
 
-      // ================= 2. UNIVERSAL SCROLL & SHADOW LOGIC =================
-      // Fungsi ini digunakan untuk semua section agar tidak mengulang kode
-      
-      const setupScrollSection = (sectionId, wrapperId, prevBtnId, nextBtnId, cardWidth, cardGap) => {
-          const section = document.getElementById(sectionId);
-          const wrapper = document.getElementById(wrapperId);
-          const prevBtn = document.getElementById(prevBtnId);
-          const nextBtn = document.getElementById(nextBtnId);
+                try {
+                    const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
+                    const data = await res.json();
+                    renderResults(data);
+                } catch (e) {
+                    results.innerHTML = `<div class="p-3 text-center text-danger">Error loading results.</div>`;
+                }
+            };
 
-          if (!section || !wrapper || !prevBtn || !nextBtn) return;
+            // Event Listeners
+            box.addEventListener('focus', () => results.classList.remove('d-none'));
+            
+            box.addEventListener('input', (e) => {
+                clearTimeout(debounce);
+                debounce = setTimeout(() => doSearch(e.target.value.trim()), 500);
+            });
 
-          const scrollStep = (cardWidth + cardGap) * 2; // Slide 2 kartu
+            // Close when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!box.contains(e.target) && !results.contains(e.target)) {
+                    results.classList.add('d-none');
+                }
+            });
+        };
 
-          const updateShadow = () => {
-              const maxScrollLeft = section.scrollWidth - section.clientWidth - 5; 
-              const currentScroll = section.scrollLeft;
-
-              if (currentScroll > 5) wrapper.classList.add('show-shadow-left');
-              else wrapper.classList.remove('show-shadow-left');
-
-              if (currentScroll < maxScrollLeft) wrapper.classList.add('show-shadow-right');
-              else wrapper.classList.remove('show-shadow-right');
-          };
-
-          nextBtn.addEventListener('click', () => {
-              section.scrollBy({ left: scrollStep, behavior: 'smooth' });
-          });
-
-          prevBtn.addEventListener('click', () => {
-              section.scrollBy({ left: -scrollStep, behavior: 'smooth' });
-          });
-
-          section.addEventListener('scroll', updateShadow);
-          
-          // Initial check (delay agar render selesai)
-          setTimeout(updateShadow, 500); 
-          window.addEventListener('resize', updateShadow);
-      };
-
-      // --- SETUP SEMUA SECTION ---
-      
-      // 1. Trending (Card 170px + Gap 1rem/16px)
-      setupScrollSection('trendingSection', 'trendingWrapper', 'trendingPrevBtn', 'trendingNextBtn', 170, 16);
-
-      // 2. Popular (Card 170px + Gap 1rem/16px)
-      setupScrollSection('popularSection', 'popularWrapper', 'popularPrevBtn', 'popularNextBtn', 170, 16);
-
-      // 3. Top Rated (Card 170px + Gap 1rem/16px)
-      setupScrollSection('topratedSection', 'topratedWrapper', 'topratedPrevBtn', 'topratedNextBtn', 170, 16);
-
-      // 4. Reviews (Card 300px + Gap 1.5rem/24px)
-      setupScrollSection('reviewsSection', 'reviewsWrapper', 'reviewPrevBtn', 'reviewNextBtn', 300, 24);
-
-
-      // ================= 3. SEARCH LOGIC =================
-      let debounceTimer;
-
-      const performSearch = async (query) => {
-          if (!query) {
-              searchResults.innerHTML = `
-                  <div class="p-3 text-center text-muted">
-                      <i class="bi bi-search mb-2 fs-4 d-block"></i>
-                      <span>Type something to search...</span>
-                  </div>
-              `;
-              searchResults.classList.remove('d-none');
-              return;
-          }
-
-          searchResults.classList.remove('d-none');
-          searchResults.innerHTML = `
-              <div class="p-4 text-center">
-                  <div class="spinner-border text-primary" role="status">
-                      <span class="visually-hidden">Loading...</span>
-                  </div>
-              </div>
-          `;
-          
-          try {
-              const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
-              if (!res.ok) throw new Error('Network response was not ok');
-              const results = await res.json();
-
-              if (results.length === 0) {
-                  searchResults.innerHTML = `
-                      <div class="p-3 text-center text-muted">
-                          <i class="bi bi-emoji-frown mb-2 fs-4 d-block"></i>
-                          <span>No results found for "${query}"</span>
-                      </div>
-                  `;
-              } else {
-                  searchResults.innerHTML = results.map(item => {
-                      const type = item.media_type === 'movie' ? 'Movie' : 'TV Show';
-                      const title = item.title || item.name;
-                      const year = (item.release_date || item.first_air_date || '').substring(0, 4);
-                      const img = item.poster_path ? `https://image.tmdb.org/t/p/w92${item.poster_path}` : 'https://placehold.co/45x68?text=No+Img';
-                      const link = item.media_type === 'movie' ? `/movie/${item.id}` : `/tv/${item.id}`;
-
-                      return `
-                          <a href="${link}" class="list-group-item list-group-item-action d-flex align-items-center gap-3 p-2 border-0 border-bottom">
-                              <img src="${img}" class="rounded" width="45" height="68" style="object-fit:cover;">
-                              <div>
-                                  <h6 class="mb-0 fw-bold text-dark">${title}</h6>
-                                  <small class="text-muted">${type} • ${year}</small>
-                              </div>
-                          </a>
-                      `;
-                  }).join('');
-              }
-          } catch (err) {
-              console.error(err);
-              searchResults.innerHTML = `<div class="p-3 text-center text-danger">Failed to load results.</div>`;
-          }
-      };
-
-      if(searchBox) {
-          searchBox.addEventListener('focus', () => {
-              if (searchBox.value.trim() === '') performSearch(''); 
-              else searchResults.classList.remove('d-none');
-          });
-
-          searchBox.addEventListener('input', (e) => {
-              clearTimeout(debounceTimer);
-              const query = e.target.value.trim();
-              if (query === '') { performSearch(''); return; }
-              debounceTimer = setTimeout(() => { performSearch(query); }, 500);
-          });
-
-          document.addEventListener('click', (e) => {
-              if (!searchBox.contains(e.target) && !searchResults.contains(e.target)) {
-                  searchResults.classList.add('d-none');
-              }
-          });
-      }
-
+        // ================= START =================
+        initHomePage();
+        initScrollHandlers();
+        initSearch();
     });
-  </script>
+</script>
 
 </body>
 </html>

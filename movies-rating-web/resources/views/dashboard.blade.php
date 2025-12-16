@@ -24,20 +24,21 @@
       <div class="card mb-3">
         <div class="card-body text-center">
           
-          {{-- LOGIKA FOTO PROFIL --}}
-          @if($user->profile_picture)
-             {{-- Jika user punya foto --}}
-             <img src="{{ asset('storage/'.$user->profile_picture) }}"
-                  class="rounded-circle object-fit-cover mb-3" 
-                  width="100" height="100" 
-                  alt="Profile Picture">
-          @else
-             {{-- Jika user BELUM punya foto (Default Icon) --}}
-             {{-- style font-size 100px diset agar ukurannya sama persis dengan width="100" pada img --}}
-             <div class="mb-3">
-                 <i class="bi bi-person-circle text-secondary" style="font-size: 100px; line-height: 1;"></i>
-             </div>
-          @endif
+{{-- LOGIKA FOTO PROFIL --}}
+@if(auth()->user()->profile_picture)
+    {{-- 1. Jika user punya foto custom di storage --}}
+    <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" 
+         alt="{{ auth()->user()->name }}" 
+         class="rounded-circle object-fit-cover" 
+         width="100" height="100">
+@else
+    {{-- 2. Jika user BELUM punya foto -> Pakai UI Avatars (Inisial Nama) --}}
+    {{-- Fungsi urlencode() penting agar spasi di nama terbaca benar oleh URL --}}
+    <img src="https://ui-avatars.com/api/?background=random&name={{ urlencode(auth()->user()->name) }}" 
+         alt="{{ auth()->user()->name }}" 
+         class="rounded-circle object-fit-cover" 
+         width="100" height="100">
+@endif
 
           <h5>{{ $user->name }}</h5>
           <p class="text-muted">{{ $user->email }}</p>

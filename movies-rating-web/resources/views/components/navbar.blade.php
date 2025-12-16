@@ -28,18 +28,21 @@
                     @auth
                         <a href="{{ route('dashboard') }}" class="d-flex align-items-center text-decoration-none gap-2">
                             
-                            {{-- LOGIKA FOTO PROFIL --}}
-                            @if(auth()->user()->profile_picture)
-                                {{-- Jika user punya foto --}}
-                                <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" 
-                                     alt="Profile" 
-                                     class="rounded-circle object-fit-cover" 
-                                     width="35" height="35">
-                            @else
-                                {{-- Jika user BELUM punya foto (Default Icon) --}}
-                                {{-- fs-3 membuat ukurannya mirip dengan width 35px --}}
-                                <i class="bi bi-person-circle {{ $textColor }} fs-3"></i>
-                            @endif
+{{-- LOGIKA FOTO PROFIL --}}
+@if(auth()->user()->profile_picture)
+    {{-- 1. Jika user punya foto custom di storage --}}
+    <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" 
+         alt="{{ auth()->user()->name }}" 
+         class="rounded-circle object-fit-cover" 
+         width="35" height="35">
+@else
+    {{-- 2. Jika user BELUM punya foto -> Pakai UI Avatars (Inisial Nama) --}}
+    {{-- Fungsi urlencode() penting agar spasi di nama terbaca benar oleh URL --}}
+    <img src="https://ui-avatars.com/api/?background=random&name={{ urlencode(auth()->user()->name) }}" 
+         alt="{{ auth()->user()->name }}" 
+         class="rounded-circle object-fit-cover" 
+         width="35" height="35">
+@endif
 
                             <span class="{{ $textColor }}">{{ auth()->user()->name }}</span>
                         </a>

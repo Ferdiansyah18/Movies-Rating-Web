@@ -9,24 +9,33 @@ class Review extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'item_id', 'item_type', 'title', 'rating', 'comment'];
+    // UPDATE BAGIAN INI
+    protected $fillable = [
+        'user_id', 
+        'item_id', 
+        'item_type', 
+        'title', 
+        'rating', 
+        'comment',
+        
+        // --- TAMBAHAN PENTING (Data Snapshot) ---
+        'media_title', 
+        'media_poster', 
+        'media_year',
+    ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // App/Models/Review.php
+    public function likes()
+    {
+        return $this->belongsToMany(User::class, 'review_likes');
+    }
 
-public function likes()
-{
-    return $this->belongsToMany(User::class, 'review_likes');
+    public function isLikedBy(User $user)
+    {
+        return $this->likes->contains($user);
+    }
 }
-
-// Helper untuk mengecek apakah user yang sedang login sudah like
-public function isLikedBy(User $user)
-{
-    return $this->likes->contains($user);
-}
-}
-

@@ -362,18 +362,23 @@
 
                             {{-- Footer Card (Avatar & Likes) --}}
                             <div class="d-flex justify-content-between align-items-center mt-3 border-top pt-3">
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center gap-2">
                                     
-                                    {{-- LOGIKA FOTO PROFIL --}}
-                                    @if($review->user && $review->user->profile_picture)
-                                        <img src="{{ asset('storage/' . $review->user->profile_picture) }}" 
-                                             class="rounded-circle object-fit-cover me-2" 
-                                             width="25" height="25" 
-                                             alt="Avatar">
-                                    @else
-                                        {{-- Icon Default (Ukuran 25px) --}}
-                                        <i class="bi bi-person-circle text-secondary me-2" style="font-size: 25px; line-height: 1;"></i>
-                                    @endif
+{{-- LOGIKA FOTO PROFIL --}}
+@if(auth()->user()->profile_picture)
+    {{-- 1. Jika user punya foto custom di storage --}}
+    <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" 
+         alt="{{ auth()->user()->name }}" 
+         class="rounded-circle object-fit-cover" 
+         width="25" height="25">
+@else
+    {{-- 2. Jika user BELUM punya foto -> Pakai UI Avatars (Inisial Nama) --}}
+    {{-- Fungsi urlencode() penting agar spasi di nama terbaca benar oleh URL --}}
+    <img src="https://ui-avatars.com/api/?background=random&name={{ urlencode(auth()->user()->name) }}" 
+         alt="{{ auth()->user()->name }}" 
+         class="rounded-circle object-fit-cover" 
+         width="25" height="25">
+@endif
 
                                     <small class="fw-semibold text-muted">{{ $review->user->name ?? 'Anonymous' }}</small>
                                 </div>

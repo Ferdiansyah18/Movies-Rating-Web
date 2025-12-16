@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+// PENTING: Import Model Review agar dikenal
+use App\Models\Review;
+
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -21,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_picture', // Tambahkan ini agar upload foto profil nanti tidak error
     ];
 
     /**
@@ -44,5 +48,18 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // =========================================================
+    //  RELATIONSHIPS (Ini yang tadi kurang)
+    // =========================================================
+
+    /**
+     * Relasi: Satu User bisa memiliki BANYAK Review.
+     * Ini dipanggil oleh controller: $request->user()->reviews()
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }

@@ -22,79 +22,70 @@
     {{-- Navbar --}}
     <x-navbar textColor="text-dark"/>
 
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                
-                {{-- Header / Back Button --}}
-                <div class="mb-4">
-                    <a href="{{ url()->previous() }}" class="text-decoration-none text-muted fw-semibold">
-                        <i class="bi bi-arrow-left me-1"></i> Cancel & Go Back
-                    </a>
-                </div>
-
-                {{-- Form Card --}}
-                <div class="card form-card bg-white p-4 p-md-5">
-                    <h2 class="fw-bold mb-1">Write your review</h2>
-                    <p class="text-muted mb-4">Share your thoughts with the CinePals community.</p>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    
+                    <div class="d-flex align-items-center mb-4">
+                        {{-- Tampilkan Poster Kecil di atas Form --}}
+                        @php
+                            $poster = $item['poster_path'] ? 'https://image.tmdb.org/t/p/w92' . $item['poster_path'] : 'https://via.placeholder.com/92x138';
+                            $title = $type == 'movie' ? $item['title'] : $item['name'];
+                            $year = $type == 'movie' 
+                                    ? substr($item['release_date'] ?? '', 0, 4) 
+                                    : substr($item['first_air_date'] ?? '', 0, 4);
+                        @endphp
+                        
+                        <img src="{{ $poster }}" class="rounded me-3 shadow-sm">
+                        <div>
+                            <small class="text-muted uppercase fw-bold">WRITING REVIEW FOR</small>
+                            <h4 class="mb-0 fw-bold">{{ $title }} <span class="text-muted fw-normal">({{ $year }})</span></h4>
+                        </div>
+                    </div>
 
                     <form action="{{ route('reviews.store') }}" method="POST">
                         @csrf
-                        {{-- Hidden Inputs --}}
-                        <input type="hidden" name="item_id" value="{{ $id }}">
+
+                        {{-- === BAGIAN PENTING: SNAPSHOT DATA (HIDDEN) === --}}
+                        <input type="hidden" name="item_id" value="{{ $item['id'] }}">
                         <input type="hidden" name="item_type" value="{{ $type }}">
+                        <input type="hidden" name="media_title" value="{{ $title }}">
+                        <input type="hidden" name="media_poster" value="{{ $item['poster_path'] }}">
+                        <input type="hidden" name="media_year" value="{{ $year }}">
 
-                        {{-- 1. Rating --}}
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Your Rating</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-warning text-dark border-0">
-                                    <i class="bi bi-star-fill"></i>
-                                </span>
-                                <select name="rating" class="form-select rating-select bg-light border-0" required>
-                                    <option value="" disabled selected>Select a score (1-10)</option>
-                                    <option value="10">10 - Masterpiece (Sempurna)</option>
-                                    <option value="9">9 - Amazing (Luar Biasa)</option>
-                                    <option value="8">8 - Great (Sangat Bagus)</option>
-                                    <option value="7">7 - Good (Bagus)</option>
-                                    <option value="6">6 - Decent (Lumayan)</option>
-                                    <option value="5">5 - Average (Rata-rata)</option>
-                                    <option value="4">4 - Mediocre (Biasa Saja)</option>
-                                    <option value="3">3 - Bad (Buruk)</option>
-                                    <option value="2">2 - Terrible (Sangat Buruk)</option>
-                                    <option value="1">1 - Abysmal (Hancur)</option>
-                                </select>
-                            </div>
+                        {{-- Form User --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Your Headline</label>
+                            <input type="text" name="title" class="form-control form-control-lg" placeholder="e.g., A Masterpiece of visual storytelling!" required>
                         </div>
 
-                        {{-- 2. Headline --}}
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Headline</label>
-                            <input type="text" name="title" class="form-control form-control-lg bg-light border-0" 
-                                   placeholder="Give a catchy title for your review" required>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Rating</label>
+                            <select name="rating" class="form-select" required>
+                                <option value="" selected disabled>Select Rating</option>
+                                @for($i=10; $i>=1; $i--)
+                                    <option value="{{ $i }}">{{ $i }} - {{ $i == 10 ? 'Masterpiece' : ($i == 1 ? 'Terrible' : 'Stars') }}</option>
+                                @endfor
+                            </select>
                         </div>
 
-                        {{-- 3. Review Body --}}
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Review</label>
-                            <textarea name="comment" class="form-control bg-light border-0" rows="8" 
-                                      placeholder="What did you like or dislike? How was the plot, acting, or visuals?" required></textarea>
-                            <div class="form-text">Your review should be honest and respectful.</div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Your Review</label>
+                            <textarea name="comment" class="form-control" rows="5" placeholder="Write your thoughts here..." required></textarea>
                         </div>
 
-                        {{-- Submit Button --}}
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-dark btn-lg py-3 fw-bold">
-                                Post Review <i class="bi bi-send-fill ms-2"></i>
-                            </button>
+                            <button type="submit" class="btn btn-dark btn-lg">Publish Review</button>
                         </div>
-
                     </form>
-                </div>
 
+                </div>
             </div>
         </div>
     </div>
+</div>
 
     {{-- Footer --}}
     <x-footer/>

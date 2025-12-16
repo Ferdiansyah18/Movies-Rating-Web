@@ -53,19 +53,21 @@
 
             <div class="col-lg-4 col-md-3 col-sm-12 text-center mb-3 order-md-2 order-1 d-flex align-items-center justify-content-center">
               
-              {{-- LOGIKA FOTO PROFIL --}}
-              @if($user->profile_picture)
-                  {{-- Jika ada foto --}}
-                  <img src="{{ asset('storage/'.$user->profile_picture) }}"
-                       class="rounded-circle object-fit-cover mb-3"
-                       width="100" height="100"
-                       alt="Profile Picture">
-              @else
-                  {{-- Jika TIDAK ada foto (Icon Default) --}}
-                  <div class="mb-3">
-                      <i class="bi bi-person-circle text-secondary" style="font-size: 100px; line-height: 1;"></i>
-                  </div>
-              @endif
+{{-- LOGIKA FOTO PROFIL --}}
+@if(auth()->user()->profile_picture)
+    {{-- 1. Jika user punya foto custom di storage --}}
+    <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" 
+         alt="{{ auth()->user()->name }}" 
+         class="rounded-circle object-fit-cover" 
+         width="100" height="100">
+@else
+    {{-- 2. Jika user BELUM punya foto -> Pakai UI Avatars (Inisial Nama) --}}
+    {{-- Fungsi urlencode() penting agar spasi di nama terbaca benar oleh URL --}}
+    <img src="https://ui-avatars.com/api/?background=random&name={{ urlencode(auth()->user()->name) }}" 
+         alt="{{ auth()->user()->name }}" 
+         class="rounded-circle object-fit-cover" 
+         width="100" height="100">
+@endif
 
             </div>
           </div>
